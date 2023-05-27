@@ -1,0 +1,50 @@
+a
+    ½Jd¦  ã                   @   s„   d Z ddlmZmZmZmZmZmZ ddlm	Z	 ddl
+mZ ddlmZ ddlmZ ddlZddlZddlZdZG d	d
+„ d
+e	ƒZdS )a?  
+
+é    )ÚPairingGroupÚZRÚG1ÚG2ÚGTÚpair)ÚABEnc)ÚPolicyParser)Ú
+SecretUtil)ÚMSPNFc                   @   s6   e Zd Zddd„Zdd„ Zdd„ Zdd	„ Zd
+d„ ZdS )ÚAnonymous_KP_ABEFc                 C   s2   t  | ¡ d| _|| _t| j|ƒ| _t| jƒad S )NzAnonymous KP-ABE)r   Ú__init__ÚnameÚgroupr   Úutilr
+   )ÚselfÚ	group_objÚverbose© r   ú(/home/long/FEASE/FEASE_KPABE/__init__.pyr      s
+    
+zAnonymous_KP_ABE.__init__c           	      C   s‚   t rtdƒ | j t¡}| j t¡}| j t¡}| j t¡}| j t¡}t||ƒ}|||| || || dœ}|||dœ}||fS )Nz
+Setup algorithm:
+)Úg_1Úg_2úg_2^b_1úg_2^b_2Úe_g1g2_a)ÚaÚb_1Úb_2)ÚdebugÚprintr   Úrandomr   r   r   r   )	r   r   r   r   r   r   Úe_g1g2ÚpkÚmskr   r   r   Úsetup   s    
+zAnonymous_KP_ABE.setupc                 C   sÀ   t rtdƒ | j t¡}| j t¡}|| }g }|D ]}| d¡d }	| |	¡ q4i }
+|D ],}| |¡}| j |t	¡}|| |
+|| < qZ|d | }|d | }|d | | }||
+|||dœS )Nz
+Encryption algorithm:
+ú:r   r   r   r   )Úattr_set_nameÚct_1Úct_2Úct_3Úct_4)
+r   r   r   r    r   ÚsplitÚappendÚindexÚhashr   )r   r"   ÚmsgÚkw_listÚs_1Ús_2ÚsÚkw_list_nameÚkwr   r'   ÚxÚkwHashr(   r)   r*   r   r   r   Úencrypt1   s$    
+zAnonymous_KP_ABE.encryptc                 C   sJ  t rtdƒ t |¡}t |¡}tƒ }| |¡ | j |¡}| jj	}| j
+ t¡}|d g}	t|d ƒD ]}
+| j
+ t¡}|	 |¡ qf|d | }i }i }d|d  }d|d  }| ¡ D ]„\}}| j |¡}| d¡d }| j
+ |t¡}t|ƒ}td	d
+„ t||	d |… ƒD ƒƒ}|d | ||  }|| ||< || ||< q¶||||dœS )Nz 
+Trapdoor generation algorithm:
+r   é   r   r   r   r%   r   c                 s   s   | ]}|d  |d  V  qdS )r   r9   Nr   )Ú.0Úir   r   r   Ú	<genexpr>n   ó    z*Anonymous_KP_ABE.keygen.<locals>.<genexpr>r   )Úattr_policy_nameÚtok_1Útok_2Útok_3)r   r   r   ÚcreatePolicyÚcopyÚdeepcopyr	   Úpolicy_stripÚconvert_policy_to_mspÚlen_longest_rowr   r    r   Úranger,   ÚitemsÚstrip_indexr+   r.   r   ÚlenÚsumÚzip)r   r"   r#   Ú	kw_policyÚkw_policy_nameÚparserÚmono_span_progÚnum_colsÚrÚvr;   Úrandr?   r@   rA   Úskt_1Úskt_2r5   ÚrowÚkw_strippedÚkw_name_labelr7   Úlen_rowÚMivtopÚtepr   r   r   ÚkeygenJ   s8    
+
+
+
+ zAnonymous_KP_ABE.keygenc                 C   sF  t rtdƒ t |d |d d¡}|dkr>tdƒ d}||fS |D ]ú}d}d}	d}
+|D ]Š}| ¡ }|d  ¡ D ]}||krn||d | 9 }qn|d	  ¡ D ]}||kr˜|	|d	 | 9 }	q˜|d
+  ¡ D ]}||krÂ|
+|d
+ | 9 }
+qÂqVt||d ƒ}t|	|d ƒ}t|
+|d ƒ}|| | }|d | |kr6d} q>qBd}qBqB||fS )Nz
+Decryption algorithm:
+r>   r&   r9   Fz!Attribute names are not matching.r   r'   r@   rA   r?   r(   r)   r*   )r   r   r   ÚpruneÚgetAttributeÚkeysr   )r   r"   ÚctÚkeyr/   ÚsubsetsÚresultÚ
+one_subsetÚ	prod_ct_1Z
+prod_key_2Z
+prod_key_3Úone_nameÚkr   Úe1Úe2Úe3Úkemr   r   r   Údecryptu   s@    zAnonymous_KP_ABE.decryptN)F)Ú__name__Ú
+__module__Ú__qualname__r   r$   r8   r^   rn   r   r   r   r   r      s
+   
++r   )Ú__doc__Úcharm.toolbox.pairinggroupr   r   r   r   r   r   Úcharm.toolbox.ABEncr   Ú
+policytreer	   Ú
+secretutilr
+   Úmspr   ÚreÚnumpyrC   r   r   r   r   r   r   Ú<module>   s    
